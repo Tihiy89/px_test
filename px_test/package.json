@@ -9,6 +9,7 @@
     "dev": "vue-cli-service serve --open"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "vue": "^2.6.11"
   },
   "devDependencies": {
@@ -36,7 +37,6 @@
     },
     "extends": [
       "plugin:vue/essential",
-      // "@vue/standard",
       "@vue/typescript/recommended",
       "@vue/airbnb"
     ],
