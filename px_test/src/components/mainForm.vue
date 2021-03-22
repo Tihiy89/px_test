@@ -18,24 +18,17 @@
 
 <script lang="ts">
 import Vue from 'vue';
-// import Axios from 'axios';
-// import { GitHubApi } from 'clientAPI.ts';
 export default Vue.extend({
   props: {},
   data(){
     return {
       user:{name: 'Не авторизованы' as string},
+      urlAut:'',
     };
-  },
-  computed:{
-    urlAut() {
-      return 'this.getUrlAutGH()';
-    },
   },
   methods: {
     getUrlAutGH() {
-      // return '13212312';
-      return this.$http_gha.getUrlForAut();
+      this.urlAut = this.$http_gha.getUrlForAut();
     },
     async getUserInfo() {
       // console.log('this.getUrlAutGH()',this.getUrlAutGH());
@@ -49,6 +42,7 @@ export default Vue.extend({
   },
   created(){
     this.getUserInfo();
+    this.getUrlAutGH();
   },
 });
 </script>
