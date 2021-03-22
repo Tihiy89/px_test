@@ -1,5 +1,6 @@
 {
   "env": {
+    "node": true,
     "browser": true,
     "es6": true
   },
@@ -22,6 +23,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "no-debugger": "off",
     "no-unused-vars": "warn",
     "space-unary-ops": [
       2,
