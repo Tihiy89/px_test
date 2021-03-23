@@ -3,7 +3,9 @@ import Axios from 'axios';
 const URL_API = 'https://api.github.com/';
 const URL_API_PART_USER = 'user';
 const URL_API_AUTH = 'https://github.com/login/oauth/authorize';
+const URL_API_AUTH2 = 'https://github.com/login/oauth/access_token';
 const URL_MY = 'http://localhost:8080/';
+const URL_CORS_ERR = 'https://cors-anywhere.herokuapp.com/';
 // const URL_API_AUTH = 'https://github.com/login/oauth/authorize';
 
 // export interface userGH{
@@ -25,17 +27,32 @@ export class GitHubApi{
 
   private axios = Axios.create();
 
-  // public async test() {
-  //   console.log('GitHubApi.test');
+  public async test() {
+    console.log('GitHubApi.test');
 
-  //   // const axios = Axios.create();
-  //   const head = { Authorization:this.token };
-  //   const res = await this.axios.get( URL_API+URL_API_PART_USER, { headers : head } ).then( (resp) => { return resp; });
+    const url = new URL(window.location.href);
+    const tmpCode = url.searchParams.get('code');
 
-  //   console.log(res);
-  //   return 0;
-  // }
+    const par = {
+      client_id: this.app_id,
+      client_secret: this.client_id,
+      code: tmpCode,
+    };
+    // const head = {'Access-Control-Allow-Origin:': URL_MY, Origin: URL_MY};
 
+    // debugger;
+    console.log('req', URL_CORS_ERR+URL_API_AUTH2);
+    const res = await this.axios.post( URL_CORS_ERR+URL_API_AUTH2, { params : par } ).then( (resp) => { return resp; });
+
+    console.log('res', res);
+
+    // const head = { Authorization:this.token };
+    // const res = await this.axios.get( URL_API+URL_API_PART_USER, { headers : head } ).then( (resp) => { return resp; });
+
+    return 0;
+  }
+
+  // получаем информацию об авторизованном пользователе, пока нам нужно только имя
   public async GetUserInfo(){
     const head = {Authorization:this.token };
     const res = await this.axios.get( URL_API+URL_API_PART_USER, { headers : head } ).then( (resp) => {
@@ -44,21 +61,24 @@ export class GitHubApi{
     return res;
   }
 
+  // токен предполагается хранить прямо в классе
   public setToken(_token:String){
     this.token = _token;
-  }
-
-  public aut() {
-    console.log('GitHubApi.aut');
-
-    return 0;
   }
 
   // формируем URL для перехода для авторизации
   // что-то вида "https://github.com/login/oauth/authorize?client_id=c5854afba787a9e4a397&redirect_uri=http://localhost:8080/"
   // в идеале добавить еще параметр state, но наши цели академические
   // и делать этого мы конечно же не будем
-  public getUrlForAut():String{
-    return `${URL_API_AUTH}?client_id=${this.client_id}&redirect_uri=${URL_MY}`;
+  public getUrlForAut_stage1():String{
+    return `${URL_API_AUTH}?client_id=${this.app_id}&redirect_uri=${URL_MY}`;
+  }
+
+
+  public getUrlForAut_stage2():String{
+    const url = new URL(window.location.href);
+    const tmpCode = url.searchParams.get('code');
+
+    return `${URL_CORS_ERR}${URL_API_AUTH2}?client_id=${this.app_id}&client_secret=${this.client_id}&code=${tmpCode}&redirect_uri=${URL_MY}`;
   }
 }
