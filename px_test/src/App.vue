@@ -10,8 +10,6 @@ import MainForm from './components/mainForm.vue';
 
 export default Vue.extend({
   name: 'App',
-  components: {
-    MainForm,
-  },
+  components: {MainForm},
 });
 </script>
