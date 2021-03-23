@@ -4,7 +4,7 @@
       <h1>Тут будет чтото полезное</h1>
       <b>Вы авторизованы как: </b> {{user.name}}
     </div>
-    <div>
+    <div v-if="!isAut">
       <button @click="getUserInfo">Получить информацию о пользователе</button>
       <br>
       <a :href="urlAut">
@@ -13,13 +13,8 @@
         </button>
       </a>
       <br>
-      <!-- <a :href="urlAut_st2">
-        <button title="Разрешить этому сайту использовать данный учетной записи на GitHub">
-          Завершить регистрацию
-        </button>
-      </a> -->
-      <button @click="test" title="Разрешить этому сайту использовать данный учетной записи на GitHub">
-        тест
+      <button @click="Aut_stage2" title="Разрешить этому сайту использовать данный учетной записи на GitHub">
+        Завершить регистрацию
       </button>
     </div>
   </div>
@@ -33,6 +28,7 @@ export default Vue.extend({
     return {
       user:{name: 'Не авторизованы' as string},
       urlAut:'',
+      isAut:false,
     };
   },
   computed:{
@@ -44,22 +40,26 @@ export default Vue.extend({
     getUrlAutGH() {
       this.urlAut = this.$http_gha.getUrlForAut_stage1();
     },
-    async getUserInfo() {
-      // console.log('this.getUrlAutGH()',this.getUrlAutGH());
 
-      // console.log('getUserInfo');
+    async getUserInfo() {
       const user = await this.$http_gha.GetUserInfo();
 
       if(user.login)
         this.user.name=user.login;
     },
-    async test(){
-      this.$http_gha.test();
+
+    async Aut_stage2(){
+      this.isAut = await this.$http_gha.Aut_bad();
     },
   },
   created(){
     this.getUserInfo();
     this.getUrlAutGH();
+  },
+  watch:{
+    isAut:function(){
+      this.getUserInfo();
+    },
   },
 });
 </script>
