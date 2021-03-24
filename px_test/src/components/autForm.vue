@@ -1,19 +1,16 @@
 <template>
   <div>
     <div>
-      <h1>Тут будет чтото полезное</h1>
       <b>Вы авторизованы как: </b> {{user.name}}
     </div>
     <div v-if="!isAut">
-      <button @click="getUserInfo">Получить информацию о пользователе</button>
-      <br>
-      <a :href="urlAut">
+      <a :href="urlAut" v-if="stageAut==0">
         <button title="Перейти на GitHub для авторизации">
           Авторизация
         </button>
       </a>
       <br>
-      <button @click="Aut_stage2" title="Разрешить этому сайту использовать данный учетной записи на GitHub">
+      <button @click="Aut_stage2" v-if="stageAut==1" title="Разрешить этому сайту использовать данный учетной записи на GitHub">
         Завершить регистрацию
       </button>
     </div>
@@ -23,26 +20,40 @@
 <script lang="ts">
 import Vue from 'vue';
 export default Vue.extend({
-  model:{
-    prop: 'isAut',
-    event:'change',
-  },
-  props: {
-    // isAut: Boolean,
-  },
   data(){
     return {
       user:{name: 'Не авторизованы' as string},
       urlAut:'',
       isAut: false,
+      codeAut: '' as String,
     };
   },
   computed:{
     urlAut_st2: function():String{
       return this.$http_gha.getUrlForAut_stage2();
     },
+    //0 - начало, 1 - получили код, 2 - авторизовались
+    stageAut: function():number{
+      const url = new URL(window.location.href);
+
+      if(this.isAut == true){
+        return 2;
+      } else
+      if( (url.searchParams.get('code')??'') !== '' ){
+        return 1;
+      }
+
+      return 0;
+    },
   },
+  async created() {
+      this.isAut = await this.$http_gha.checkUserToken();
+      console.log('afrom', this.isAut);
+      this.getUserInfo();
+      this.getUrlAutGH();
+    },
   methods: {
+
     getUrlAutGH() {
       this.urlAut = this.$http_gha.getUrlForAut_stage1();
     },
@@ -50,18 +61,16 @@ export default Vue.extend({
     async getUserInfo() {
       const user = await this.$http_gha.GetUserInfo();
 
-      if(user.login)
+      if(user && user.login)
         this.user.name=user.login;
     },
 
     async Aut_stage2(){
       this.isAut = await this.$http_gha.Aut_bad();
+      this.$emit('aut-complete', this.isAut);
     },
   },
-  created(){
-    this.getUserInfo();
-    this.getUrlAutGH();
-  },
+
   watch:{
     isAut:function(){
       this.getUserInfo();

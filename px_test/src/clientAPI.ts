@@ -20,6 +20,12 @@ export class GitHubApi{
 
   private axios = Axios.create();
 
+  // токен может уже лежать в хранилище, проверяем, забираем
+  constructor(){
+    if(localStorage.user_token)
+      this.token = localStorage.user_token;
+  }
+
   // плохая авторизация через левый сервис
   // https://cors-anywhere.herokuapp.com/
   // я обязательно попробую по-другому
@@ -42,28 +48,17 @@ export class GitHubApi{
       this.token = this.token.trim();
     }
 
+    localStorage.user_token = this.token;
+    window.location.replace(URL_MY);
     return this.token !== '';
   }
 
-  // получаем информацию об авторизованном пользователе, пока нам нужно только имя
-  public async GetUserInfo(){
-    const head = {Authorization:this.token };
+  public async checkUserToken():Promise<boolean>{
+    if(this.token!='' && await this.GetUserInfo()!==null){
+      return true;
+    }
 
-    const res = await this.axios.get( URL_API+URL_API_PART_USER, { headers : head } ).then( (resp) => {
-      return resp.data; });
-
-    return res;
-  }
-
-  // токен предполагается хранить прямо в классе
-  public setToken(_token:String){
-    this.token = _token;
-  }
-
-  // обновляем свой адрес
-  public setMyURL(){
-    const url = new URL(window.location.href);
-    URL_MY = url.origin;
+    return false;
   }
 
   // формируем URL для перехода для авторизации
@@ -80,4 +75,29 @@ export class GitHubApi{
 
     return `${URL_CORS_ERR}${URL_API_AUTH2}?client_id=${this.app_id}&client_secret=${this.client_id}&code=${tmpCode}&redirect_uri=${URL_MY}`;
   }
+
+  // получаем информацию об авторизованном пользователе, пока нам нужно только имя
+  public async GetUserInfo(){
+    const head = {Authorization:this.token };
+
+    try{
+      const res = await this.axios.get( URL_API+URL_API_PART_USER, { headers : head } ).then( (resp) => {
+        return resp.data; });
+      return res;
+    }catch{
+      return null;
+    }
+  }
+
+  // обновляем свой адрес
+  public setMyURL(){
+    const url = new URL(window.location.href);
+    URL_MY = url.origin;
+  }
+
+  // токен предполагается хранить прямо в классе
+  public setToken(_token:String){
+    this.token = _token;
+  }
+
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
-    isAut mainform {{isAut}}<br>
-    <autForm v-if="!isAut" v-model="isAut"/>
+    <h1>Пробуем API GitHub</h1>
+    <autForm @aut-complete="autComplete" />
     <filterForm v-if="isAut"/>
   </div>
 </template>
@@ -18,8 +18,19 @@ export default Vue.extend({
       isAut: false,
     };
   },
-  beforeCreate(){
+  async beforeCreate(){
     this.$http_gha.setMyURL();
+  },
+  async created() {
+    this.isAut = await this.$http_gha.checkUserToken();
+  },
+  methods:{
+    autComplete(isAutForm:any){
+      this.isAut = isAutForm;
+    },
+    async CheckUserToken():Promise<boolean>{
+      return await this.$http_gha.checkUserToken();
+    },
   },
 });
 </script>
