@@ -4,8 +4,8 @@ const URL_API = 'https://api.github.com/';
 const URL_API_PART_USER = 'user';
 const URL_API_AUTH = 'https://github.com/login/oauth/authorize';
 const URL_API_AUTH2 = 'https://github.com/login/oauth/access_token';
-const URL_MY = 'http://localhost:8080/';
 const URL_CORS_ERR = 'https://cors-anywhere.herokuapp.com/';
+let URL_MY = 'http://localhost:8080/';
 
 export class GitHubApi{
   // пароль? наверное не пригодится
@@ -58,6 +58,12 @@ export class GitHubApi{
   // токен предполагается хранить прямо в классе
   public setToken(_token:String){
     this.token = _token;
+  }
+
+  // обновляем свой адрес
+  public setMyURL(){
+    const url = new URL(window.location.href);
+    URL_MY = url.origin;
   }
 
   // формируем URL для перехода для авторизации

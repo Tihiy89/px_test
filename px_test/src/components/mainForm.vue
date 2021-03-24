@@ -18,5 +18,8 @@ export default Vue.extend({
       isAut: false,
     };
   },
+  beforeCreate(){
+    this.$http_gha.setMyURL();
+  },
 });
 </script>
