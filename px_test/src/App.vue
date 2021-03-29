@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import MainForm from './components/mainForm.vue';
+import MainForm from './components/form/mainForm.vue';
 
 export default Vue.extend({
   name: 'App',
