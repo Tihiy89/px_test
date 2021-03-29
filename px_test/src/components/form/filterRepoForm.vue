@@ -3,6 +3,7 @@
     link_repo {{link_repo}}<br>
     <b :title="helpMsg.linkRepo">Ссылка на репозитарий  </b>
     <input type="text" @change="changeRepo" v-model="link_repo">
+    <br>
     <button @click="test">
       test
     </button>
@@ -11,16 +12,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import {reposGitHub} from '@/components/classes/repos';
+
 export default Vue.extend({
   props: {},
   data(){
     return {
       helpMsg: {linkRepo: 'Укажите сссылку на репозитарий для анализа'},
       link_repo: 'nfriedly/set-cookie-parser',
-      oRepo : {
-        linkFull: 'nfriedly/set-cookie-parser',
-        listRepo: [] as String[],
-      },
+      oRepo : new reposGitHub() as reposGitHub,
     };
   },
   methods:{
@@ -28,6 +28,10 @@ export default Vue.extend({
       return 0;
     },
     test(){
+      // debugger;
+      // eslint-disable-next-line
+      const repo:reposGitHub = new reposGitHub();
+
       // this.default_repo += '12';
     },
   },

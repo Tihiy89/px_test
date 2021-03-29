@@ -100,4 +100,21 @@ export class GitHubApi{
     this.token = _token;
   }
 
+  // предполагается что это универсальный метод для доставания данных через АПИ
+  public async GitHubAPI(_url_api:string, api_meth:'get'|'post'='get'):Promise<any>{
+
+    const head = {Authorization:this.token };
+    try{
+      const res = await this.axios({
+        method: api_meth,
+        url:URL_API+_url_api,
+        headers: head,
+      }).then( (resp) => {return resp.data;});
+
+      return res;
+    }catch{
+      return null;
+    }
+  }
+
 }
