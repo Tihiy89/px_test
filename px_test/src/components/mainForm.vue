@@ -2,17 +2,17 @@
   <div>
     <h1>Пробуем API GitHub</h1>
     <autForm @aut-complete="autComplete" />
-    <filterForm v-if="isAut"/>
+    <filterRepoForm v-if="isAut"/>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import autForm from './autForm.vue';
-import filterForm from './filterForm.vue';
+import filterRepoForm from './filterRepoForm.vue';
 
 export default Vue.extend({
-  components:{autForm,filterForm},
+  components:{autForm,filterRepoForm},
   data(){
     return {
       isAut: false,
