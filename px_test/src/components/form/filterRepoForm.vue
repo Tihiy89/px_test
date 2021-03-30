@@ -25,19 +25,10 @@ export default Vue.extend({
   },
   methods:{
     changeRepo(){
-      return 0;
+      this.oRepo.setUrlGH(this.link_repo);
     },
     test(){
-      // debugger;
-      // eslint-disable-next-line
-      const repo:reposGitHub = new reposGitHub();
-
-      // this.default_repo += '12';
-    },
-  },
-  watch:{
-    link_repo: function(){
-      // link_repo
+      this.oRepo.setUrlGH(this.link_repo);
     },
   },
 });
