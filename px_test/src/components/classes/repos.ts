@@ -83,29 +83,21 @@ export class reposGitHub {
     if( this.typeRepo ){
       const res = await this.ghApi.useAPI(this.URL_API_REPO());
 
-      this.listBranch = Object.assign([], JSON.parse(this.makeUserArray(res,['name']))) ;
+      this.listRepo = Object.assign( [], JSON.parse(this.makeUserArray(res, 'name')));
     }
   }
 
   /** из ответов содержащих много всего, пробуем делать "удобные" массивы
    * предполагается что объект массив, в переменной head те свойства - котоорые переносим
   */
-  private makeUserArray( _o: string, head: string[] ):string{
+  private makeUserArray( _o: string, head: string ):string{
     const ob = JSON.parse(_o);
     const resArray = [];
 
     for (const i1 of ob){
-
-      // console.log('makeUserArray for (const i1 of ob)',i1,head);
-
-      let itemNew = {};
-      for (const i2 in head){
-        if(i1[head[i2]]){
-          itemNew = Object.assign({}, itemNew, {[head[i2]]: i1[head[i2]]} );
-        }
+      if(i1[head]){
+        resArray.push(i1[head]);
       }
-
-      resArray.push(itemNew);
     }
     return JSON.stringify(resArray);
   }
