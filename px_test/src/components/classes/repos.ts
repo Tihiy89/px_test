@@ -73,8 +73,21 @@ export class reposGitHub {
           this.typeRepo = TYPE_REPO_USER;
         else
           this.typeRepo = TYPE_REPO_ORG;
+      }else{
+        this.clearRepo();
       }
+
     }
+  }
+
+  /** ф-я очищает все данные которые могут предоставляться наружу*/
+  private async clearRepo(){
+    this.name       = '';
+    this.nameRepo   = '';
+    this.listRepo   = [];
+    this.listBranch = [];
+    this.mainBranch = '';
+    this.workBranch = '';
   }
 
   /** получаем информацию о доступныъх репозитариях */
@@ -123,8 +136,20 @@ export class reposGitHub {
   // методы для использования извне,
   // по смыслу должны только определить репозитарий, а дальше получать готовые данные
   // ----------------------------
-  public setUrlGH(_url: string = 'nfriedly/set-cookie-parser') {
-    this.parseUrlGH(_url);
+
+  public async setUrlGH(_url: string = '') {
+    await this.parseUrlGH(_url);
+  }
+
+  /** геттеры */
+
+  /** список доступных репозитариев для исследуемого пользователя/оргии*/
+  public getlistRepo():string[]{
+    return (this.typeRepo !== null)? Object.assign([],this.listRepo)  : [];
+  }
+  /** имя обследуемой учетной записи*/
+  public getTargetName():string{
+    return (this.typeRepo !== null)? this.name : '';
   }
 
 }
