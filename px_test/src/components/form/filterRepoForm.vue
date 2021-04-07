@@ -6,16 +6,21 @@
     <datalist id="listRepo">
       <option v-for="item in listRepos" :key="item" :value="item"></option>
     </datalist>
-    Branch
+    <br>
+    branch
     <select @change="changeBranch" v-model="workBranch">
       <option v-for="item in listBranch" :key="item" :value="item">{{item}}</option>
     </select>
-    <!-- <input type="" @change="changeBranch" v-model="link_branch" list="listBranch" size="50">
-    <datalist id="listBranch">
-      <option v-for="item in listBranch" :key="item" :value="item"></option>
-    </datalist> -->
+    период анализа с
+    <input type="date" v-model="dateStart">
+    по
+    <input type="date" v-model="dateEnd">
     <br>
     this.workBranch {{this.workBranch}}
+    <br>
+    dateStart {{dateStart}}
+    <br>
+    dateEnd {{dateEnd}}
     <br>
     <button @click="test">
       test
@@ -35,6 +40,8 @@ export default Vue.extend({
       linkRepo: 'nfriedly/node-unblocker' as string,
       workBranch: '' as string,
       oRepo : new reposGitHub() as reposGitHub,
+      dateStart: null as null|string,
+      dateEnd: null as null|string,
     };
   },
   computed:{
@@ -51,19 +58,23 @@ export default Vue.extend({
       return this.oRepo.getlistBranch();
     },
   },
-  created(){
-    this.changeRepo();
+  async created(){
+    await this.changeRepo();
+    await this.changeBranch();
   },
   methods:{
     async changeRepo(){
       await this.oRepo.setUrlGH(this.linkRepo);
       this.workBranch = this.oRepo.getDefaultBranch();
     },
-    changeBranch(){
-//
+    async changeBranch(){
+      await this.oRepo.setBranch(this.workBranch);
+      this.dateStart = this.oRepo.getDefaultDateStart();
+      this.dateEnd = this.oRepo.getDefaultDateEnd();
     },
     async test(){
-      await this.oRepo.setUrlGH(this.linkRepo);
+      console.log('this.dateStart',this.dateStart);
+      console.log('typeof this.dateStart', typeof this.dateStart );
     },
   },
 });
