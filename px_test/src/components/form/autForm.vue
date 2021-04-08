@@ -48,7 +48,6 @@ export default Vue.extend({
   },
   async created() {
       this.isAut = await this.$http_gha.checkUserToken();
-      console.log('afrom', this.isAut);
       this.getUserInfo();
       this.getUrlAutGH();
     },

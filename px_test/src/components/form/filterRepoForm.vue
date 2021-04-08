@@ -15,15 +15,15 @@
     <input type="date" v-model="dateStart">
     по
     <input type="date" v-model="dateEnd">
-    <br>
+    <!-- <br>
     this.workBranch {{this.workBranch}}
     <br>
     dateStart {{dateStart}}
     <br>
-    dateEnd {{dateEnd}}
+    dateEnd {{dateEnd}} -->
     <br>
     <button @click="test">
-      test
+      Запустить анализ
     </button>
   </div>
 </template>
@@ -73,8 +73,9 @@ export default Vue.extend({
       this.dateEnd = this.oRepo.getDefaultDateEnd();
     },
     async test(){
-      console.log('this.dateStart',this.dateStart);
-      console.log('typeof this.dateStart', typeof this.dateStart );
+      // console.log('this.dateStart',this.dateStart);
+      // console.log('typeof this.dateStart', typeof this.dateStart );
+      this.oRepo.ReposAnalysis();
     },
   },
 });

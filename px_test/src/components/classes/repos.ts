@@ -6,7 +6,7 @@ const TYPE_REPO_USER = 'USER';
 const TYPE_REPO_ORG =  'ORG';
 
 import { GitHubApi } from '@/components/classes/clientAPI';
-import { ghCommit } from '@/components/classes/intCommits';
+import { ghCommit, ghAuthByComm, ghAuthByCommSort } from '@/components/classes/intCommits';
 
 /** предполагается что этот класс описывает объет исследования (юещр или орг-я на гитхаб)
 *   и содерит все необходимые механизмы для получения и подготовки информации
@@ -36,9 +36,10 @@ export class reposGitHub {
   private mainBranch: string = '';
   private workBranch: string = '';
 
-  /** коммиты */
+  /** коммиты и статистика вокруг них*/
   // private listCommits: ghListCommit = [];
-  private listCommits: any = [];
+  private listCommits: ghCommit[] = [];
+  private listAutByCom: ghAuthByComm[] = [];
 
   // private
 
@@ -60,7 +61,7 @@ export class reposGitHub {
   // ----------------------------
 
   /**  */
-  private URL_API_LISTCOMMITS(page: number = 1, dateStart: null|Date = null, dateEnd: null|Date = null): string {
+  private URL_API_LISTCOMMITS(page: number = 1, dateStart: null|string = null, dateEnd: null|string = null): string {
     return `repos/${this.name}/${this.nameRepo}/commits`
       +`?sha=${this.workBranch}&per_page=${this.perPage}&page=${page}`
       + ( (dateStart) ? `&since=${dateStart}` : `` )
@@ -131,6 +132,7 @@ export class reposGitHub {
     this.dateEnd    = null;
   }
 
+  /** дата в виде строки форматв гггг-мм-дд */
   private getDateStr(_d:Date):string{
     const y = (_d.getFullYear()).toString();
     const m = (_d.getMonth()+1).toString();
@@ -139,19 +141,20 @@ export class reposGitHub {
     return ('0'+y).slice(-4) + '-' + ('0'+m).slice(-2) + '-' + ('0'+d).slice(-2);
   }
 
-  private async loadBranchInfo() {
+  private async loadBranchInfo(_ds:string|null=null, _de:string|null=null ) {
+    // временный объект и итоговые массивы
+    let tmpCommits = this.listCommits = this.listAutByCom = Object.assign( [] );
+
     if( this.typeRepo && this.workBranch){
-      // const res = JSON.parse(await this.ghApi.useAPI(this.URL_API_LISTCOMMITS(1)));
-      this.listCommits = Object.assign( [] );
       let page: number = 1;
       while (page) {
-        const res = JSON.parse(await this.ghApi.useAPI(this.URL_API_LISTCOMMITS(page)));
-        // console.log('this.URL_API_LISTCOMMITS(page)', this.URL_API_LISTCOMMITS(page));
-        this.listCommits = this.listCommits.concat( res );
-        page = ( this.listCommits.length < page*this.perPage) ? 0 : page + 1;
+        const res = JSON.parse(await this.ghApi.useAPI(this.URL_API_LISTCOMMITS(page, _ds, _de)));
+        tmpCommits = tmpCommits.concat( res );
+        page = ( tmpCommits.length < page*this.perPage) ? 0 : page + 1;
       }
     }
-    console.log('this.listCommits', this.listCommits);
+
+    this.makeCommitArray(JSON.stringify(tmpCommits));
   }
 
   /** получаем информацию о доступныъх репозитариях */
@@ -178,6 +181,7 @@ export class reposGitHub {
         }
 
         // ищем ветку по-умолчанию
+        // Общая информация о репозитарии
         const res = JSON.parse( await this.ghApi.useAPI(this.URL_API_GETREPO()));
         if(res.default_branch)
         {
@@ -208,18 +212,63 @@ export class reposGitHub {
     return JSON.stringify(resArray);
   }
 
-  private makeCommitArray( _o: string):string{
+  private makeUserArray2( _o: string, head: string[] ):string{
     const ob = JSON.parse(_o);
-    const resArray: ghCommit[] = [];
+    const resArray:String[][] = [];
 
     for (const i1 of ob){
-      if(i1.commit && i1.commit.author){
-        // {}
-        resArray.push({ date: new Date , author: i1.commit.author});
+      let _tmpOb = Object.assign({});
+      for(const i2 of head){
+        if(i1[i2]){
+          _tmpOb = Object.assign({},_tmpOb,{[i2]: i1[i2]});
+        }
+
+        if( !this.ObjEmpty ){
+          resArray.push(_tmpOb);
+        }
       }
     }
     return JSON.stringify(resArray);
   }
+
+  /** подразумевается что не только парсим коммиты (хотя получается а зачем они дальше?), но пусть будут
+   *  но и вычисляем по пути информацию которую можем, в нашем случае авторов
+   *  то есть результат работы ф-ии - заполненные массивы
+   *  this.listCommits, this.listAutByCom
+   */
+  private makeCommitArray( _o: string){
+    const ob = JSON.parse(_o);
+    const resArray: ghCommit[] = [];
+    const abc: ghAuthByComm[] = [];
+
+    for (const itemCommit of ob){
+      if(itemCommit.commit && itemCommit.commit.author
+          && itemCommit.commit.author.name && itemCommit.commit.author.date){
+        // формируем список коммитов
+        resArray.push({ date: itemCommit.commit.author.date , author: itemCommit.commit.author.name});
+        // собираем статистику по авторам
+        const itemAuth = abc.find(item=>{return item.author===itemCommit.commit.author.name;});
+
+        if(itemAuth){
+          itemAuth.countComm++;
+        } else {
+          abc.push({author:itemCommit.commit.author.name , countComm: 1});
+        }
+      }
+    }
+
+    abc.sort(ghAuthByCommSort);
+
+    this.listCommits = Object.assign(resArray);
+    this.listAutByCom = Object.assign(abc);
+  }
+
+   private ObjEmpty(_o: any):boolean{
+     for(const i1 in _o){
+       return false;
+     }
+     return true;
+   }
 
   /** пытаемся проверить и распарсить URL */
   private async parseUrlGH(_url: string) {
@@ -240,11 +289,17 @@ export class reposGitHub {
   // по смыслу должны только определить репозитарий, а дальше получать готовые данные
   // ----------------------------
 
+  /** метод устанавливает ветку репозитария для дальнешейго анализа */
   public async setBranch(_br: string){
     this.workBranch = _br;
+  }
+
+  /** непосредственно анализ выбрпнной ветки репозитария */
+  public ReposAnalysis(){
     this.loadBranchInfo();
   }
 
+  /** попытка выбрать репозитарий */
   public async setUrlGH(_url: string = '') {
     // анализируем адрес
     await this.parseUrlGH(_url);
