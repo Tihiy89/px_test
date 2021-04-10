@@ -25,14 +25,21 @@
     <button @click="test">
       Запустить анализ
     </button>
+    <table-form v-model="AuthActive"/>
+    <!-- <br>
+    {{AuthActive}} -->
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import {reposGitHub} from '@/components/classes/repos';
+import tableForm from '@/components/form/tableForm.vue';
+
+// const p1:ghAuthByComm[] = []
 
 export default Vue.extend({
+  components: { tableForm },
   props: {},
   data(){
     return {
@@ -42,13 +49,21 @@ export default Vue.extend({
       oRepo : new reposGitHub() as reposGitHub,
       dateStart: null as null|string,
       dateEnd: null as null|string,
+      // p1: null as ghAuthByComm,
     };
   },
   computed:{
+    // AuthActive: function():ghAuthByComm[]{
+    //   // return {};
+    // },
+    AuthActive: function():any{
+      return [{author: 'Autor a', countComm: 12}
+        ,{author: 'Autor B', countComm: 2}
+        ,{author: 'Autor F', countComm: 45}];
+    },
     listRepos: function():string[]{
       const res:string[] = this.oRepo.getlistRepo();
       const nameTarget = this.linkRepo.substring(0, this.linkRepo.lastIndexOf('/'));
-
       for(let ind in res){
         res[ind] = nameTarget + '/' + res[ind] ;
       }
@@ -61,6 +76,10 @@ export default Vue.extend({
   async created(){
     await this.changeRepo();
     await this.changeBranch();
+
+    // @ts-ignore no-undef
+    const p1:ghAuthByComm[] = [];
+    // const p1 :Object as PropType<ghAuthByComm>;//:ghAuthByComm[] = [];
   },
   methods:{
     async changeRepo(){

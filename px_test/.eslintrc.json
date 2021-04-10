@@ -23,6 +23,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "no-undef": "off",
     "no-debugger": "off",
     "no-unused-vars": "warn",
     "space-unary-ops": [
