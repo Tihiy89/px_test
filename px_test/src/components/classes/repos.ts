@@ -6,7 +6,6 @@ const TYPE_REPO_USER = 'USER';
 const TYPE_REPO_ORG =  'ORG';
 
 import { GitHubApi } from '@/components/classes/clientAPI';
-import { ghCommit, ghAuthByComm, ghAuthByCommSort } from '@/components/classes/intCommits';
 
 /** предполагается что этот класс описывает объет исследования (юещр или орг-я на гитхаб)
 *   и содерит все необходимые механизмы для получения и подготовки информации
@@ -130,6 +129,17 @@ export class reposGitHub {
     this.workBranch = '';
     this.dateStart  = null;
     this.dateEnd    = null;
+    this.listCommits = [];
+    this.listAutByCom = [];
+  }
+
+  /** авторов сортируем по количеству коммитов, если равное по имени */
+  private ghAuthByCommSort(_a:ghAuthByComm, _b:ghAuthByComm):number{
+    if( _a.countComm > _b.countComm
+        || (_a.countComm == _b.countComm && _a.author > _b.author) ){
+      return 1;
+    }
+    return -1;
   }
 
   /** дата в виде строки форматв гггг-мм-дд */
@@ -257,7 +267,7 @@ export class reposGitHub {
       }
     }
 
-    abc.sort(ghAuthByCommSort);
+    abc.sort(this.ghAuthByCommSort);
 
     this.listCommits = Object.assign(resArray);
     this.listAutByCom = Object.assign(abc);
@@ -312,6 +322,13 @@ export class reposGitHub {
   }
 
   /** геттеры */
+
+  /** Возвращаем список авторов
+   * _sort - актив/пассив авторы
+   */
+  public getAuthList(_sort:'active'|'passive' = 'active', _count:number = 30):ghAuthByComm[]{
+    return (_sort == 'active')? this.listAutByCom.slice(0,_count) : this.listAutByCom.slice(-_count);
+  }
 
   /** список доступных веток для исследуемого репозитария*/
   public getDefaultBranch():string{

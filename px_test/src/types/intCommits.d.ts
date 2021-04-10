@@ -1,8 +1,9 @@
-export interface ghCommit{
+interface ghCommit{
   author: string,
   date: Date,
 }
-export interface ghAuthByComm{
+
+interface ghAuthByComm{
   author: string,
   countComm: number,
 }
