@@ -137,9 +137,9 @@ export class reposGitHub {
   private ghAuthByCommSort(_a:ghAuthByComm, _b:ghAuthByComm):number{
     if( _a.countComm > _b.countComm
         || (_a.countComm == _b.countComm && _a.author > _b.author) ){
-      return 1;
+      return -1;
     }
-    return -1;
+    return 1;
   }
 
   /** дата в виде строки форматв гггг-мм-дд */
