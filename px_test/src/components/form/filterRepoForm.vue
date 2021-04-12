@@ -35,8 +35,8 @@
       {{getTitleTab(3)}}
     </button>
     <p>{{titleTab}}</p>
-    <table-form v-if="mode==0" v-model="AuthActive"/>
-    <table-form v-if="mode==1" v-model="AuthPassive"/>
+    <table-form v-if="mode==0" v-model="AuthActive" :headList="['Пользователь','Число Commit']"/>
+    <table-form v-if="mode==1" v-model="AuthPassive" :headList="['Пользователь','Число Commit']"/>
   </div>
 </template>
 
