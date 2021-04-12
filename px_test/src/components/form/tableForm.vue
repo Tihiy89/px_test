@@ -33,7 +33,6 @@ export default Vue.extend({
   },
   methods:{
     fillTableData(){
-      console.log('this.tBody',this.tBody);
       this.tData = Object.assign([]);
       this.tBody.forEach((rowItem: any, rowIndex) => {
         const tRow = Object.assign({});
@@ -49,7 +48,6 @@ export default Vue.extend({
         }
         this.tData.push(tRow);
       });
-      console.log('this.tData',this.tData);
     },
     test(){
       this.fillTableData();
