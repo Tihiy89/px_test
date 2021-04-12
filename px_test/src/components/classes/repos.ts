@@ -222,25 +222,6 @@ export class reposGitHub {
     return JSON.stringify(resArray);
   }
 
-  private makeUserArray2( _o: string, head: string[] ):string{
-    const ob = JSON.parse(_o);
-    const resArray:String[][] = [];
-
-    for (const i1 of ob){
-      let _tmpOb = Object.assign({});
-      for(const i2 of head){
-        if(i1[i2]){
-          _tmpOb = Object.assign({},_tmpOb,{[i2]: i1[i2]});
-        }
-
-        if( !this.ObjEmpty ){
-          resArray.push(_tmpOb);
-        }
-      }
-    }
-    return JSON.stringify(resArray);
-  }
-
   /** подразумевается что не только парсим коммиты (хотя получается а зачем они дальше?), но пусть будут
    *  но и вычисляем по пути информацию которую можем, в нашем случае авторов
    *  то есть результат работы ф-ии - заполненные массивы
@@ -327,7 +308,7 @@ export class reposGitHub {
    * _sort - актив/пассив авторы
    */
   public getAuthList(_sort:'active'|'passive' = 'active', _count:number = 30):ghAuthByComm[]{
-    return (_sort == 'active')? this.listAutByCom.slice(0,_count) : this.listAutByCom.slice(-_count);
+    return (_sort == 'active')? this.listAutByCom.slice(0,_count) : this.listAutByCom.slice(-_count).reverse();
   }
 
   /** список доступных веток для исследуемого репозитария*/
