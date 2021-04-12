@@ -1,18 +1,18 @@
 <template>
   <div>
     <table class="tableForm">
-      <tr v-for="row in tBody" :key="row">
-        <th v-for="item in row" :key="item">
-          {{item}}
+      <tr v-for="row in tData" :key="row.ind">
+        <th v-for="item in row.Cols" :key="item.ind">
+          {{item.val}}
         </th>
       </tr>
     </table>
     <br>
-    <button @click="test">
+    <!-- <button @click="test">
       а пока кнопка
     </button>
     <br>
-    tBody {{tBody}}
+    tData {{tData}} -->
   </div>
 </template>
 
@@ -32,14 +32,38 @@ export default Vue.extend({
     console.log('tableForm created',this);
   },
   methods:{
+    fillTableData(){
+      console.log('this.tBody',this.tBody);
+      this.tData = Object.assign([]);
+      this.tBody.forEach((rowItem: any, rowIndex) => {
+        const tRow = Object.assign({});
+        tRow.ind = rowIndex;
+        tRow.Cols = Object.assign([]);
+
+        let col = 0;
+        for(const colIndex in rowItem){
+          const tCol = Object.assign({});
+          tCol.ind = col++;
+          tCol.val = rowItem[colIndex];
+          tRow.Cols.push(tCol);
+        }
+        this.tData.push(tRow);
+      });
+      console.log('this.tData',this.tData);
+    },
     test(){
-      console.log('tableForm test',this);
+      this.fillTableData();
     },
   },
   data(){
     return {
-      // value: null as any,
+      // просто выводить массив прямо из tBody можно, но неправильно
+      // то есть да отдельный объект написан сознательно
+      tData: [] as tableRow[],
     };
+  },
+  watch:{
+    tBody: 'fillTableData',
   },
 });
 </script>
