@@ -36,11 +36,11 @@ export class reposGitHub {
   private workBranch: string = '';
 
   /** коммиты и статистика вокруг них*/
-  // private listCommits: ghListCommit = [];
   private listCommits: ghCommit[] = [];
   private listAutByCom: ghAuthByComm[] = [];
 
-  // private
+  /** pullrquest */
+  private listPR: ghPullReq[] = [];
 
   // настройки общие
   private perPage: number = 100;
@@ -80,6 +80,13 @@ export class reposGitHub {
   /** список веток */
   private URL_API_LISTBRANCHES(page: number = 1): string {
     return `repos/${this.name}/${this.nameRepo}/branches?per_page=${this.perPage}&page=${page}`;
+  }
+
+  /** Список PR, фильтровать прямо в апи нельзя, */
+  private URL_API_LISTPULLREQ(page: number = 1): string {
+    return `repos/${this.name}/${this.nameRepo}/pulls?per_page=${this.perPage}`
+          +`&page=${page}&base=${this.workBranch}`
+          +`&state=all`;
   }
 
   /**информация о репозитарии*/
@@ -152,8 +159,18 @@ export class reposGitHub {
   }
 
   private async loadBranchInfo(_ds:string|null=null, _de:string|null=null ) {
-    // временный объект и итоговые массивы
-    let tmpCommits = this.listCommits = this.listAutByCom = Object.assign( [] );
+    // зануляем итоговые массивы
+    this.listPR = this.listCommits = this.listAutByCom = Object.assign( [] );
+
+    this.loadCommitInfo(_ds, _de);
+    this.loadPRInfo(_ds, _de);
+  }
+
+  // todo: на болььших репозитриях на формирование массивов уходит достаточно много времени,
+  // наверное правильно не тащить все во временный объект а фильтровать уже на этом этапе только нужную информацию
+  // замечание1
+  private async loadCommitInfo(_ds:string|null=null, _de:string|null=null){
+    let tmpCommits = Object.assign( [] );
 
     if( this.typeRepo && this.workBranch){
       let page: number = 1;
@@ -165,6 +182,25 @@ export class reposGitHub {
     }
 
     this.makeCommitArray(JSON.stringify(tmpCommits));
+  }
+
+  // todo аналогично замечанию1
+  // но в то же время на данном этапе выгодно хранить все имеющиеся списки параллельно
+  // возможно при расширении функционала лучше быдет оставить один базовый список и из него 
+  // сделать получать нужный список своим отдельным методом
+  private async loadPRInfo(_ds:string|null=null, _de:string|null=null){
+    let tmpPR = Object.assign( [] );
+
+    if( this.typeRepo && this.workBranch){
+      let page: number = 1;
+      while (page) {
+        const res = JSON.parse(await this.ghApi.useAPI(this.URL_API_LISTPULLREQ(page)));
+        tmpPR = tmpPR.concat( res );
+        page = ( tmpPR.length < page*this.perPage) ? 0 : page + 1;
+      }
+    }
+
+    this.makePrArray(JSON.stringify(tmpPR));
   }
 
   /** получаем информацию о доступныъх репозитариях */
@@ -252,6 +288,33 @@ export class reposGitHub {
 
     this.listCommits = Object.assign(resArray);
     this.listAutByCom = Object.assign(abc);
+  }
+
+  /** полный список PullRequest отфилтрованный по датам */
+  private makePrArray( _o: string){
+    const ob = JSON.parse(_o);
+    const resArray: ghPullReq[] = [];
+
+    for (const itemPR of ob){
+      if(itemPR.url && itemPR.title && itemPR.base && itemPR.base.ref 
+          && itemPR.user && itemPR.user.login){
+        const dCreate = new Date(itemPR.created_at);
+        if( this.dateStart && this.dateEnd && dCreate >= this.dateStart && dCreate <= this.dateEnd){
+          const dClose = ((itemPR.closed_at!=null)? new Date(itemPR.closed_at) : new Date());
+          const countDay = Math.floor(((dClose.getTime() - dCreate.getTime())/(1000*3600*24)));
+
+          resArray.push({
+            name: itemPR.title,
+            dateCreate: dCreate,
+            link: itemPR.url,
+            auth: itemPR.user.login,
+            dayOpen: countDay,
+            state: (itemPR.state == 'closed') ? 'closed' : 'open',
+          });
+        }
+    }
+
+    this.listPR = Object.assign(resArray);
   }
 
    private ObjEmpty(_o: any):boolean{

@@ -1,3 +1,4 @@
+// commits
 interface ghCommit{
   author: string,
   date: Date,
@@ -11,6 +12,15 @@ interface ghAuthByComm{
 interface ghAuthByComm{
   author: string,
   countComm: number,
+}
+// pr
+interface ghPullReq{
+  name: string,
+  dateCreate: Date,
+  link: string,
+  auth: string,
+  dayOpen: number,
+  state: 'open'|'closed',
 }
 
 // вспомогательные типы для табичной формы
