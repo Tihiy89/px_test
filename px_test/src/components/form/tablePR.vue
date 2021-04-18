@@ -1,6 +1,6 @@
 <template>
   <div>
-    <table class="tableForm">
+    <table>
       <tr v-for="row in tData" :key="row.ind">
         <th v-for="item in row.Cols" :key="item.ind">
           {{item.val}}
@@ -8,6 +8,11 @@
       </tr>
     </table>
     <br>
+    <!-- <button @click="test">
+      а пока кнопка
+    </button>
+    <br>
+    tData {{tData}} -->
   </div>
 </template>
 
@@ -15,7 +20,7 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-  name: 'tableForm',
+  name: 'tablePr',
   model:{
     prop: 'tBody',
   },
@@ -76,12 +81,17 @@ export default Vue.extend({
         this.tData.push(tRow);
       });
     },
+    test(){
+      // this.fillTableData();
+      // console.log(this);
+    },
   },
   data(){
     return {
       // просто выводить массив прямо из tBody можно, но неправильно
       // то есть да отдельный объект написан сознательно
       tData: [] as tableRow[],
+      // tHead: [] as tableRow[],
     };
   },
   watch:{

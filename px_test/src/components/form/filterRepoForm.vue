@@ -43,22 +43,18 @@
     <button @click="mode=2">
       {{getTitleTab(2)}}
     </button>
-    <button @click="mode=3">
-      {{getTitleTab(3)}}
-    </button>
     <p>{{titleTab}}</p>
     <table-form v-if="mode==0" v-model="AuthActive" :headList="['Пользователь','Число Commit']"/>
     <table-form v-if="mode==1" v-model="AuthPassive" :headList="['Пользователь','Число Commit']"/>
+    <table-pr v-if="mode==2" v-model="PullReqList" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import {reposGitHub} from '@/components/classes/repos';
-import tableForm from '@/components/form/tableForm.vue';
 
 export default Vue.extend({
-  components: { tableForm },
   props: {},
   data(){
     return {
@@ -79,6 +75,15 @@ export default Vue.extend({
     AuthPassive: function():ghAuthByComm[]{
       return this.oRepo.getAuthList('passive');
     },
+    cntPullReqClose: function():number{
+      return this.oRepo.getPullReqCount('close');
+    },
+    cntPullReqOpen: function():number{
+      return this.oRepo.getPullReqCount('open');
+    },
+    cntPullReqOld: function():number{
+      return this.oRepo.getPullReqCount('old');
+    },
     listRepos: function():string[]{
       const res:string[] = this.oRepo.getlistRepo();
       const nameTarget = this.linkRepo.substring(0, this.linkRepo.lastIndexOf('/'));
@@ -90,14 +95,8 @@ export default Vue.extend({
     listBranch: function():string[]{
       return this.oRepo.getlistBranch();
     },
-    cntPullReqClose: function():number{
-      return this.oRepo.getPullReqCount('close');
-    },
-    cntPullReqOpen: function():number{
-      return this.oRepo.getPullReqCount('open');
-    },
-    cntPullReqOld: function():number{
-      return this.oRepo.getPullReqCount('old');
+    PullReqList: function():ghPullReq[]{
+      return this.oRepo.getPullReqList('all');
     },
     titleTab: function():string{
       return this.getTitleTab(this.mode);
@@ -127,10 +126,7 @@ export default Vue.extend({
           resTitle = 'Пассивные авторы';
           break;
         case 2:
-          resTitle = 'Тут может быть ваша реклама';
-          break;
-        case 3:
-          resTitle = 'Тут может быть ваша реклама';
+          resTitle = 'Список pull request';
           break;
         default:
           resTitle = 'Неизвестное значение';
@@ -141,8 +137,8 @@ export default Vue.extend({
       this.oRepo.ReposAnalysis();
     },
     async test(){
-      this.oRepo.ReposAnalysis();
-      console.log(this.oRepo);
+      // this.oRepo.ReposAnalysis();
+      console.log('PullReqList', this.oRepo.getPullReqList('all'));
     },
   },
 });
