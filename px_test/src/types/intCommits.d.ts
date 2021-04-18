@@ -32,4 +32,5 @@ interface tableRow{
 interface tableCol{
   ind: number,
   val: string|number,
+  link: string='',
 }

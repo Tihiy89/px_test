@@ -309,7 +309,7 @@ export class reposGitHub {
           resArray.push({
             name: itemPR.title,
             dateCreate: dCreate,
-            link: itemPR.url,
+            link: itemPR.html_url,
             auth: itemPR.user.login,
             dayOpen: countDay,
             state: (itemPR.state == 'closed') ? 'closed' : 'open',
