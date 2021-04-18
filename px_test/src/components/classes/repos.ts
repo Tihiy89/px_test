@@ -158,24 +158,27 @@ export class reposGitHub {
     return ('0'+y).slice(-4) + '-' + ('0'+m).slice(-2) + '-' + ('0'+d).slice(-2);
   }
 
-  private async loadBranchInfo(_ds:string|null=null, _de:string|null=null ) {
+  private async loadBranchInfo() {
     // зануляем итоговые массивы
     this.listPR = this.listCommits = this.listAutByCom = Object.assign( [] );
 
-    this.loadCommitInfo(_ds, _de);
-    this.loadPRInfo(_ds, _de);
+    this.loadCommitInfo();
+    this.loadPRInfo();
   }
 
   // todo: на болььших репозитриях на формирование массивов уходит достаточно много времени,
   // наверное правильно не тащить все во временный объект а фильтровать уже на этом этапе только нужную информацию
   // замечание1
-  private async loadCommitInfo(_ds:string|null=null, _de:string|null=null){
+  private async loadCommitInfo(){
     let tmpCommits = Object.assign( [] );
 
     if( this.typeRepo && this.workBranch){
       let page: number = 1;
       while (page) {
-        const res = JSON.parse(await this.ghApi.useAPI(this.URL_API_LISTCOMMITS(page, _ds, _de)));
+        const res = JSON.parse(await this.ghApi.useAPI(
+            this.URL_API_LISTCOMMITS(page
+              , (this.dateStart!=null)?this.getDateStr(this.dateStart):null
+              , (this.dateEnd!=null)?this.getDateStr(this.dateEnd):null )));
         tmpCommits = tmpCommits.concat( res );
         page = ( tmpCommits.length < page*this.perPage) ? 0 : page + 1;
       }
@@ -186,9 +189,9 @@ export class reposGitHub {
 
   // todo аналогично замечанию1
   // но в то же время на данном этапе выгодно хранить все имеющиеся списки параллельно
-  // возможно при расширении функционала лучше быдет оставить один базовый список и из него 
+  // возможно при расширении функционала лучше быдет оставить один базовый список и из него
   // сделать получать нужный список своим отдельным методом
-  private async loadPRInfo(_ds:string|null=null, _de:string|null=null){
+  private async loadPRInfo(){
     let tmpPR = Object.assign( [] );
 
     if( this.typeRepo && this.workBranch){
@@ -291,12 +294,12 @@ export class reposGitHub {
   }
 
   /** полный список PullRequest отфилтрованный по датам */
-  private makePrArray( _o: string){
+  private makePrArray( _o: string ){
     const ob = JSON.parse(_o);
     const resArray: ghPullReq[] = [];
 
     for (const itemPR of ob){
-      if(itemPR.url && itemPR.title && itemPR.base && itemPR.base.ref 
+      if(itemPR.url && itemPR.title && itemPR.base && itemPR.base.ref
           && itemPR.user && itemPR.user.login){
         const dCreate = new Date(itemPR.created_at);
         if( this.dateStart && this.dateEnd && dCreate >= this.dateStart && dCreate <= this.dateEnd){
@@ -312,12 +315,12 @@ export class reposGitHub {
             state: (itemPR.state == 'closed') ? 'closed' : 'open',
           });
         }
+      }
     }
-
     this.listPR = Object.assign(resArray);
   }
 
-   private ObjEmpty(_o: any):boolean{
+  private ObjEmpty(_o: any):boolean{
      for(const i1 in _o){
        return false;
      }
@@ -386,6 +389,7 @@ export class reposGitHub {
     }
     return null;
   }
+
   /** дата для начала анализи ( пока это текущая дата )*/
   public getDefaultDateEnd():string|null{
     if(this.dateEnd){
@@ -398,20 +402,27 @@ export class reposGitHub {
   public getlistBranch():string[]{
     return (this.typeRepo !== null)? Object.assign([],this.listBranch)  : [];
   }
+
   /** список доступных репозитариев для исследуемого пользователя/оргии*/
   public getlistRepo():string[]{
     return (this.typeRepo !== null)? Object.assign([],this.listRepo)  : [];
   }
+
+  public getPullReqCount(type:'open'|'close'|'old'= 'open'):number{
+    const cnt = this.listPR.reduce( (cnt,item)=>{
+          if( (type == 'open' && item.state == 'open') 
+            || (type == 'close' && item.state == 'closed' )
+            || (type == 'old' && item.dayOpen >= 30 ) )
+            cnt++;
+          return cnt;
+        }, 0 );
+
+    return cnt;
+  }
+
   /** имя обследуемой учетной записи*/
   public getTargetName():string{
     return (this.typeRepo !== null)? this.name : '';
   }
 
 }
-
-
-
-// export interface records{
-//   head:string[],
-//   values: string[][],
-// }

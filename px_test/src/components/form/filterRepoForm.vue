@@ -17,10 +17,22 @@
     по
     <input type="date" v-model="dateEnd">
     <br>
-    <button @click="test">
+    <button @click="AnalisRepo">
       Запустить анализ
     </button>
     <br>
+    Количество Pull request, открытых
+    <input type="text" v-model="cntPullReqOpen">
+    закрытых
+    <input type="text" v-model="cntPullReqClose">
+    старых
+    <input type="text" v-model="cntPullReqOld">
+    <br>
+    <br>
+    <button @click="test">
+        тест
+    </button>
+  <br>
     <!-- БЛОК С ДАННЫМИ, при расширеении - делим на компоненты -->
     <button @click="mode=0">
       {{getTitleTab(0)}}
@@ -78,6 +90,15 @@ export default Vue.extend({
     listBranch: function():string[]{
       return this.oRepo.getlistBranch();
     },
+    cntPullReqClose: function():number{
+      return this.oRepo.getPullReqCount('close');
+    },
+    cntPullReqOpen: function():number{
+      return this.oRepo.getPullReqCount('open');
+    },
+    cntPullReqOld: function():number{
+      return this.oRepo.getPullReqCount('old');
+    },
     titleTab: function():string{
       return this.getTitleTab(this.mode);
     },
@@ -116,8 +137,12 @@ export default Vue.extend({
       }
       return resTitle;
     },
+    async AnalisRepo(){
+      this.oRepo.ReposAnalysis();
+    },
     async test(){
       this.oRepo.ReposAnalysis();
+      console.log(this.oRepo);
     },
   },
 });
