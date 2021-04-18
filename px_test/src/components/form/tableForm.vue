@@ -1,5 +1,25 @@
 <template>
   <div>
+    <div>
+      Отобразить
+      <label>
+        открытые
+        <input type="checkbox" id="state" checked>
+      </label>
+      <label>
+        закрытые
+        <input type="checkbox" id="state" checked>
+      </label>
+      <label>
+        не старше 30 дней
+        <input type="checkbox" id="state" checked>
+      </label>
+      <label>
+        старше
+        <input type="checkbox" id="state" checked>
+      </label>
+
+    </div>
     <div v-if="paginate>0">
       <button @click="pageDown" >&lt;&lt;</button>
       <input type="number" v-model="page" min="1" :max="maxPage" size="3" @change="pageChek">
