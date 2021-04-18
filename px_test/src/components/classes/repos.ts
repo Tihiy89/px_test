@@ -410,14 +410,29 @@ export class reposGitHub {
 
   public getPullReqCount(type:'open'|'close'|'old'= 'open'):number{
     const cnt = this.listPR.reduce( (cnt,item)=>{
-          if( (type == 'open' && item.state == 'open') 
-            || (type == 'close' && item.state == 'closed' )
-            || (type == 'old' && item.dayOpen >= 30 ) )
+          if( (type == 'open' && item.state == 'open')
+            || (type == 'close' && item.state == 'closed')
+            || (type == 'old' && item.dayOpen >= 30) )
             cnt++;
           return cnt;
         }, 0 );
 
     return cnt;
+  }
+
+  public getPullReqList(type:'all'|'open'|'close'|'old'= 'all'):ghPullReq[]{
+    const Res = this.listPR.filter( (item)=>{
+          if( (type == 'open' && item.state == 'open')
+            || (type == 'close' && item.state == 'closed')
+            || (type == 'old' && item.dayOpen >= 30)
+            || type == 'all' )
+            return true;
+          return false;
+        }, 0 );
+
+    console.log('this.listPR', this.listPR);
+    console.log('getPullReqList', Res);
+    return Res;
   }
 
   /** имя обследуемой учетной записи*/
