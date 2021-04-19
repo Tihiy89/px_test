@@ -46,7 +46,7 @@
     <p>{{titleTab}}</p>
     <table-form v-if="mode==0" v-model="AuthActive" :headList="['Пользователь','Число Commit']"/>
     <table-form v-if="mode==1" v-model="AuthPassive" :headList="['Пользователь','Число Commit']"/>
-    <table-pr v-if="mode==2" v-model="PullReqList" />
+    <table-pr v-if="mode==2" v-model="PullReqList" @filter-change="setFilterPR"/>
   </div>
 </template>
 
@@ -66,6 +66,13 @@ export default Vue.extend({
       mode : 0 as Number,
       oRepo : new reposGitHub() as reposGitHub,
       workBranch: '' as string,
+      // фильтр pull request
+      filterPR: {
+        showOpen: true,
+        showClose: true,
+        showNew: true,
+        showOld: true,
+      } as ghPullReqFilter,
     };
   },
   computed:{
@@ -96,7 +103,7 @@ export default Vue.extend({
       return this.oRepo.getlistBranch();
     },
     PullReqList: function():ghPullReq[]{
-      return this.oRepo.getPullReqList('all');
+      return this.oRepo.getPullReqList(this.filterPR);
     },
     titleTab: function():string{
       return this.getTitleTab(this.mode);
@@ -136,9 +143,11 @@ export default Vue.extend({
     async AnalisRepo(){
       this.oRepo.ReposAnalysis();
     },
+    setFilterPR(filter: ghPullReqFilter){
+      this.filterPR = Object.assign({},filter);
+    },
     async test(){
-      // this.oRepo.ReposAnalysis();
-      console.log('PullReqList', this.oRepo.getPullReqList('all'));
+      console.log('test');
     },
   },
 });

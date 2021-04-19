@@ -23,6 +23,13 @@ interface ghPullReq{
   state: 'open'|'closed',
 }
 
+interface ghPullReqFilter{
+  showOpen: boolean = true,
+  showClose: boolean = true,
+  showNew: boolean = true,
+  showOld: boolean = true,
+}
+
 // вспомогательные типы для табичной формы
 interface tableRow{
   ind: number,

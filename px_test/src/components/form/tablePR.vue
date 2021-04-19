@@ -1,6 +1,25 @@
 <template>
   <div>
-    <table-form v-model="tBody" :headList="['Название','Автор','Создан']" :sortData="['name','auth','dayOpen']" link="link:name" :paginate="25"/>
+    <div>
+      Отобразить
+      <label>
+        открытые
+        <input type="checkbox" id="state" checked v-model="showOpen">
+      </label>
+      <label>
+        закрытые
+        <input type="checkbox" id="state" checked v-model="showClose">
+      </label>
+      <label>
+        не старше 30 дней
+        <input type="checkbox" id="state" checked v-model="showNew">
+      </label>
+      <label>
+        старше
+        <input type="checkbox" id="state" checked v-model="showOld">
+      </label>
+    </div>
+    <table-form v-model="tBody" :headList="['Название','Автор','Открыт (дней)']" :sortData="['name','auth','dayOpen']" link="link:name" :paginate="25"/>
   </div>
 </template>
 
@@ -15,15 +34,28 @@ export default Vue.extend({
   props: {
     tBody: {type: Array, default: null},
   },
-  methods:{
-    test(){
-      // this.fillTableData();
-      // console.log(this);
+  computed:{
+    filterParam: function():ghPullReqFilter{
+      return {
+        showOpen: this.showOpen,
+        showClose: this.showClose,
+        showNew: this.showNew,
+        showOld: this.showOld,
+      };
     },
   },
   data(){
     return {
+      showOpen: true,
+      showClose: true,
+      showNew: true,
+      showOld: true,
     };
+  },
+  watch:{
+    filterParam: function(){
+      this.$emit('filter-change', this.filterParam);
+    },
   },
 });
 </script>

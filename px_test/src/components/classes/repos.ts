@@ -420,18 +420,22 @@ export class reposGitHub {
     return cnt;
   }
 
-  public getPullReqList(type:'all'|'open'|'close'|'old'= 'all'):ghPullReq[]{
+  /** список PullReq с учетом фильтра */
+  public getPullReqList(filter: ghPullReqFilter):ghPullReq[]{
     const Res = this.listPR.filter( (item)=>{
-          if( (type == 'open' && item.state == 'open')
-            || (type == 'close' && item.state == 'closed')
-            || (type == 'old' && item.dayOpen >= 30)
-            || type == 'all' )
+          if( (
+                (filter.showOpen == true && item.state == 'open')
+                ||(filter.showClose == true && item.state == 'closed')
+              )
+            &&(
+                (filter.showOld == true && item.dayOpen >= 30)
+                ||(filter.showNew == true && item.dayOpen < 30)
+              )
+            )
             return true;
           return false;
         }, 0 );
 
-    console.log('this.listPR', this.listPR);
-    console.log('getPullReqList', Res);
     return Res;
   }
 
