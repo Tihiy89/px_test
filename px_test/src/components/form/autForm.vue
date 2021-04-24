@@ -29,9 +29,6 @@ export default Vue.extend({
     };
   },
   computed:{
-    urlAut_st2: function():String{
-      return this.$http_gha.getUrlForAut_stage2();
-    },
     //0 - начало, 1 - получили код, 2 - авторизовались
     stageAut: function():number{
       const url = new URL(window.location.href);

@@ -3,18 +3,19 @@ import Axios from 'axios';
 const URL_API = 'https://api.github.com/';
 const URL_API_PART_USER = 'user';
 const URL_API_AUTH = 'https://github.com/login/oauth/authorize';
-const URL_API_AUTH2 = 'https://github.com/login/oauth/access_token';
-const URL_CORS_ERR = 'https://cors-anywhere.herokuapp.com/';
+const URL_API_AUTH2 = 'http://github.com/login/oauth/access_token';
+const URL_API_AUTH_PROXY = 'http://localhost:9006/';
+
+// const URL_CORS_ERR = 'https://cors-anywhere.herokuapp.com/';
 let URL_MY = 'http://localhost:8080/';
 const API_HEAD_DEF = {accept: 'application/vnd.github.v3+json'};
 
 export class GitHubApi{
-  /** идентификтаор приложения гитхаб */
+  // /** идентификтаор приложения гитхаб */
   private app_id:String = 'c5854afba787a9e4a397';
-  /** идентификтаор клиентского приложения */
-  private client_id:String = '2db9bbe82e963db416698f664506769dfa5a1b1f';
+  // /** идентификтаор клиентского приложения */
+  // private client_id:String = '2db9bbe82e963db416698f664506769dfa5a1b1f';
   /** токен пользователя */
-  // private token:String = 'bearer aa4664bb64beb403cc8d37fb43f0c03f3eaf2386';
   private token:String = '';
 
   private axios = Axios.create();
@@ -34,11 +35,12 @@ export class GitHubApi{
 
     const par = {
       client_id: this.app_id,
-      client_secret: this.client_id,
+      // client_secret: this.client_id,
       code: tmpCode,
+      url:URL_API_AUTH2,
     };
 
-    const res = await this.axios.post( URL_CORS_ERR+URL_API_AUTH2, par).then( (resp) => { return resp; });
+    const res = await this.axios.post( URL_API_AUTH_PROXY, par).then( (resp) => { return resp; });
 
     if( res.data !== undefined ){
       // парсить не хочется, сделаем URL И разберем стандартными ф-ми
@@ -48,7 +50,7 @@ export class GitHubApi{
     }
 
     localStorage.user_token = this.token;
-    window.location.replace(URL_MY);
+    // window.location.replace(URL_MY);
     return this.token !== '';
   }
 
@@ -68,12 +70,6 @@ export class GitHubApi{
     return `${URL_API_AUTH}?client_id=${this.app_id}&redirect_uri=${URL_MY}`;
   }
 
-  public getUrlForAut_stage2():String{
-    const url = new URL(window.location.href);
-    const tmpCode = url.searchParams.get('code');
-
-    return `${URL_CORS_ERR}${URL_API_AUTH2}?client_id=${this.app_id}&client_secret=${this.client_id}&code=${tmpCode}&redirect_uri=${URL_MY}`;
-  }
 
   /** получаем информацию об авторизованном пользователе, пока нам нужно только имя */
   public async GetUserInfo(){
