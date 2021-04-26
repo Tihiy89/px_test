@@ -62,7 +62,7 @@ export default Vue.extend({
     },
 
     async Aut_stage2(){
-      this.isAut = await this.$http_gha.Aut_bad();
+      this.isAut = await this.$http_gha.Aut();
       this.$emit('aut-complete', this.isAut);
     },
   },

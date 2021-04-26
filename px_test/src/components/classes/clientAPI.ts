@@ -3,7 +3,7 @@ import Axios from 'axios';
 const URL_API = 'https://api.github.com/';
 const URL_API_PART_USER = 'user';
 const URL_API_AUTH = 'https://github.com/login/oauth/authorize';
-const URL_API_AUTH2 = 'http://github.com/login/oauth/access_token';
+const URL_API_AUTH2 = 'https://github.com/login/oauth/access_token';
 const URL_API_AUTH_PROXY = 'http://localhost:9006/';
 
 // const URL_CORS_ERR = 'https://cors-anywhere.herokuapp.com/';
@@ -26,10 +26,10 @@ export class GitHubApi{
       this.token = localStorage.user_token;
   }
 
-  /** плохая авторизация через левый сервис
-  https://cors-anywhere.herokuapp.com/
-  я обязательно попробую по-другому */
-  public async Aut_bad():Promise<boolean> {
+  /**  авторизация через свой http сервер
+   *  брать тут https://github.com/Tihiy89/serv_aut_gitHUb.git
+   */
+  public async Aut():Promise<boolean> {
     const url = new URL(window.location.href);
     const tmpCode = url.searchParams.get('code');
 
