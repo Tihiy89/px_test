@@ -4,6 +4,7 @@ import {GitHubApi} from './components/classes/clientAPI';
 import tableForm from '@/components/form/tableForm.vue';
 import tablePr from '@/components/form/tablePR.vue';
 import MainForm from '@/components/form/mainForm.vue';
+import './style/style.css';
 
 // объект через который предлполагается взаимодействие с gitHub
 Vue.prototype.$http_gha = new GitHubApi;

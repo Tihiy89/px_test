@@ -22,16 +22,13 @@
     </button>
     <br>
     Количество Pull request, открытых
-    <input type="text" v-model="cntPullReqOpen">
+    <input type="text" v-model="cntPullReqOpen" disabled class="noDisable">
     закрытых
-    <input type="text" v-model="cntPullReqClose">
+    <input type="text" v-model="cntPullReqClose" disabled class="noDisable">
     старых
-    <input type="text" v-model="cntPullReqOld">
+    <input type="text" v-model="cntPullReqOld" disabled class="noDisable">
     <br>
     <br>
-    <button @click="test">
-        тест
-    </button>
   <br>
     <!-- БЛОК С ДАННЫМИ, при расширеении - делим на компоненты -->
     <button @click="mode=0">
@@ -145,9 +142,6 @@ export default Vue.extend({
     },
     setFilterPR(filter: ghPullReqFilter){
       this.filterPR = Object.assign({},filter);
-    },
-    async test(){
-      console.log('test');
     },
   },
 });

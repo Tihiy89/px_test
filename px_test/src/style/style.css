@@ -1,0 +1,56 @@
+:root{
+  --primary: #929DBE;
+  --secondary: #727297;
+  --lines-elem: #645F5D;
+  --lines-elem-sec: #8f8784;
+  --inputs: #BABC9C;
+}
+
+*, .primary {
+  background-color: var(--primary);
+  align-items: center;
+  /* align-content: center; */
+  text-align: center;
+  vertical-align: middle;
+  margin: 2px;
+}
+
+.elements, button {
+  background-color: var(--secondary);
+  border-color: var(--lines-elem);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 3px;
+}
+
+input, select, option{
+  background-color: var(--inputs);
+  border-color: var(--lines-elem);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 3px;
+}
+
+select{
+  appearance: none;
+}
+
+.tableForm {
+  align-items: center;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 3px;
+  margin: auto;
+  border-collapse: collapse;
+  border-color: var(--lines-elem);
+}
+
+.tableForm th,tr {
+  border-style: solid;
+  border-width: 1px;
+   border-color: var(--lines-elem-sec);
+}
+
+.noDisable:disabled{
+  color: black;
+}

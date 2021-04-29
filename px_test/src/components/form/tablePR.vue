@@ -4,19 +4,19 @@
       Отобразить
       <label>
         открытые
-        <input type="checkbox" id="state" checked v-model="showOpen">
+        <input type="checkbox" checked v-model="showOpen">
       </label>
       <label>
         закрытые
-        <input type="checkbox" id="state" checked v-model="showClose">
+        <input type="checkbox" checked v-model="showClose">
       </label>
       <label>
         не старше 30 дней
-        <input type="checkbox" id="state" checked v-model="showNew">
+        <input type="checkbox" checked v-model="showNew">
       </label>
       <label>
         старше
-        <input type="checkbox" id="state" checked v-model="showOld">
+        <input type="checkbox" checked v-model="showOld">
       </label>
     </div>
     <table-form v-model="tBody" :headList="['Название','Автор','Открыт (дней)']" :sortData="['name','auth','dayOpen']" link="link:name" :paginate="25"/>
