@@ -444,4 +444,13 @@ export class reposGitHub {
     return (this.typeRepo !== null)? this.name : '';
   }
 
+  // сеттеры
+  public setDefaultDateStart(_dateStr:string){
+    this.dateStart = new Date(_dateStr);
+  }
+
+  public setDefaultDateEnd(_dateStr:string){
+    this.dateEnd = new Date(_dateStr);
+  }
+
 }

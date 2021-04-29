@@ -3,7 +3,7 @@
     <!-- БЛОК С ФИЛЬТРАМИ -->
     linkRepo {{linkRepo}}<br>
     <b :title="helpMsg.linkRepo">Ссылка на репозитарий  </b>
-    <input type="text" @change="changeRepo" v-model="linkRepo" list="listRepo" size="50">
+    <input type="text" @input="changeRepo" v-model="linkRepo" list="listRepo" size="50">
     <datalist id="listRepo">
       <option v-for="item in listRepos" :key="item" :value="item"></option>
     </datalist>
@@ -12,24 +12,34 @@
     <select @change="changeBranch" v-model="workBranch">
       <option v-for="item in listBranch" :key="item" :value="item">{{item}}</option>
     </select>
-    период анализа с
-    <input type="date" v-model="dateStart">
-    по
-    <input type="date" v-model="dateEnd">
+    <div class="inlineBlock">период анализа </div>
+    <div class="inlineBlock">
+       с
+      <input type="date" v-model="dateStart" @change="setDateStart"></div>
+    <div class="inlineBlock">
+       по
+      <input type="date" v-model="dateEnd" @change="setDateEnd">
+    </div>
     <br>
     <button @click="AnalisRepo">
       Запустить анализ
     </button>
     <br>
-    Количество Pull request, открытых
-    <input type="text" v-model="cntPullReqOpen" disabled class="noDisable">
-    закрытых
-    <input type="text" v-model="cntPullReqClose" disabled class="noDisable">
-    старых
-    <input type="text" v-model="cntPullReqOld" disabled class="noDisable">
+    <div class="inlineBlock">
+      <div class="inlineBlock">
+        Количество Pull request, открытых
+        <input type="text" v-model="cntPullReqOpen" disabled class="noDisable" size="5">
+      </div>
+      <div class="inlineBlock">
+        закрытых
+        <input type="text" v-model="cntPullReqClose" disabled class="noDisable" size="5">
+        старых
+        <input type="text" v-model="cntPullReqOld" disabled class="noDisable" size="5">
+      </div>
+      <div class="inlineBlock"></div>
+      <div class="inlineBlock"></div>
+    </div>
     <br>
-    <br>
-  <br>
     <!-- БЛОК С ДАННЫМИ, при расширеении - делим на компоненты -->
     <button @click="mode=0">
       {{getTitleTab(0)}}
@@ -90,7 +100,10 @@ export default Vue.extend({
     },
     listRepos: function():string[]{
       const res:string[] = this.oRepo.getlistRepo();
-      const nameTarget = this.linkRepo.substring(0, this.linkRepo.lastIndexOf('/'));
+      const i1 = this.linkRepo.lastIndexOf('/');
+      const nameTarget = this.linkRepo.substring(0, ((i1 != -1)? i1 : undefined) );
+      console.log('nameTarget', nameTarget);
+      console.log('this.linkRepo.lastIndexOf', this.linkRepo.lastIndexOf('/'));
       for(let ind in res){
         res[ind] = nameTarget + '/' + res[ind] ;
       }
@@ -139,6 +152,14 @@ export default Vue.extend({
     },
     async AnalisRepo(){
       this.oRepo.ReposAnalysis();
+    },
+    setDateStart(){
+      if(this.dateStart)
+        this.oRepo.setDefaultDateStart(this.dateStart);
+    },
+    setDateEnd(){
+      if(this.dateEnd)
+        this.oRepo.setDefaultDateEnd(this.dateEnd);
     },
     setFilterPR(filter: ghPullReqFilter){
       this.filterPR = Object.assign({},filter);

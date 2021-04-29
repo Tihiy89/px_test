@@ -54,3 +54,8 @@ select{
 .noDisable:disabled{
   color: black;
 }
+
+.inlineBlock {
+  display: inline-block;
+  text-align: center;
+}
