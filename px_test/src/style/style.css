@@ -1,11 +1,17 @@
+/* глобальные значения */
 :root{
   --primary: #929DBE;
   --secondary: #727297;
   --lines-elem: #645F5D;
   --lines-elem-sec: #8f8784;
   --inputs: #BABC9C;
+  --inputs-valid:  #6DA284;
+  --inputs-notvalid:  #B79D9D;
+  --font-color-def: black;
+
 }
 
+/* основной стиль */
 *, .primary {
   background-color: var(--primary);
   align-items: center;
@@ -15,6 +21,7 @@
   margin: 2px;
 }
 
+/* элементы */
 .elements, button {
   background-color: var(--secondary);
   border-color: var(--lines-elem);
@@ -35,6 +42,15 @@ select{
   appearance: none;
 }
 
+.inputValid{
+  background-color: var(--inputs-valid);
+}
+
+.inputNotValid{
+  background-color: var(--inputs-notvalid);
+}
+
+/* компонент таблица */
 .tableForm {
   align-items: center;
   border-style: solid;
@@ -51,11 +67,35 @@ select{
    border-color: var(--lines-elem-sec);
 }
 
+/* если запрещенное поле не должно выделяться шрифтом */
 .noDisable:disabled{
-  color: black;
+  color: var(--font-color-def);
 }
 
+/* для правильных переносов, свой класс для блоков */
 .inlineBlock {
   display: inline-block;
   text-align: center;
+}
+
+/* стиль для формы-индикатора загрузки данных */
+.loadingForm_background {
+  margin: 0; /* убираем отступы */
+  padding: 0; /* убираем отступы */
+  position: fixed; /* фиксируем положение */
+  top:0; /* растягиваем блок по всему экрану */
+  bottom:0;
+  left:0;
+  right:0;
+  background: rgba(0,0,0,0.5); /* полупрозрачный цвет фона */
+  z-index:100; /* выводим фон поверх всех слоев на странице браузера */
+  /* text-align: center;
+  vertical-align: middle; */
+  display: flex;
+}
+
+.loadingForm_body {
+  margin: auto;
+  padding: 20px;
+  border-radius: 5px;
 }

@@ -1,11 +1,11 @@
 <template>
   <div>
+    <loadingForm v-if="loading"/>
     <!-- БЛОК С ФИЛЬТРАМИ -->
-    linkRepo {{linkRepo}}<br>
     <b :title="helpMsg.linkRepo">Ссылка на репозитарий  </b>
-    <input type="text" @input="changeRepo" v-model="linkRepo" list="listRepo" size="50">
+    <input :class="(validRepo)?'inputValid':'inputNotValid' " type="text" @input="changeRepo" v-model="linkRepo" list="listRepo" size="50">
     <datalist id="listRepo">
-      <option v-for="item in listRepos" :key="item" :value="item"></option>
+      <option v-for="item in listRepo" :key="item" :value="item"></option>
     </datalist>
     <br>
     branch
@@ -41,13 +41,13 @@
     </div>
     <br>
     <!-- БЛОК С ДАННЫМИ, при расширеении - делим на компоненты -->
-    <button @click="mode=0">
+    <button @click="mode=0" :class="(mode==0)?'inputValid':''">
       {{getTitleTab(0)}}
     </button>
-    <button @click="mode=1">
+    <button @click="mode=1" :class="(mode==1)?'inputValid':''">
       {{getTitleTab(1)}}
     </button>
-    <button @click="mode=2">
+    <button @click="mode=2" :class="(mode==2)?'inputValid':''">
       {{getTitleTab(2)}}
     </button>
     <p>{{titleTab}}</p>
@@ -69,6 +69,9 @@ export default Vue.extend({
       dateEnd: null as null|string,
       helpMsg: {linkRepo: 'Укажите сссылку на репозитарий для анализа'},
       linkRepo: 'nfriedly/node-unblocker' as string,
+      listRepo: [] as string[],
+      // индикатор загрузки данных при запуске анализа
+      loading: false as Boolean,
       // 0 - активные авторы, 1 - пассивные авторы, 2 - , 3 -
       mode : 0 as Number,
       oRepo : new reposGitHub() as reposGitHub,
@@ -80,6 +83,9 @@ export default Vue.extend({
         showNew: true,
         showOld: true,
       } as ghPullReqFilter,
+      // вспомогательные
+      linkRepo_old: '' as string,
+      nameTarget_old: '' as string,
     };
   },
   computed:{
@@ -98,19 +104,12 @@ export default Vue.extend({
     cntPullReqOld: function():number{
       return this.oRepo.getPullReqCount('old');
     },
-    listRepos: function():string[]{
-      const res:string[] = this.oRepo.getlistRepo();
-      const i1 = this.linkRepo.lastIndexOf('/');
-      const nameTarget = this.linkRepo.substring(0, ((i1 != -1)? i1 : undefined) );
-      console.log('nameTarget', nameTarget);
-      console.log('this.linkRepo.lastIndexOf', this.linkRepo.lastIndexOf('/'));
-      for(let ind in res){
-        res[ind] = nameTarget + '/' + res[ind] ;
-      }
-      return res;
-    },
     listBranch: function():string[]{
       return this.oRepo.getlistBranch();
+    },
+    nameTarget: function():string{
+      const i1 = this.linkRepo.lastIndexOf('/');
+      return this.linkRepo.substring(0, ((i1 != -1)? i1 : undefined) );
     },
     PullReqList: function():ghPullReq[]{
       return this.oRepo.getPullReqList(this.filterPR);
@@ -118,20 +117,53 @@ export default Vue.extend({
     titleTab: function():string{
       return this.getTitleTab(this.mode);
     },
+    validRepo: function():boolean{
+      return this.oRepo.getRepoIsValid();
+    },
   },
   async created(){
+    this.linkRepo = await this.oRepo.getDefaultRepoLink();
     await this.changeRepo();
     await this.changeBranch();
   },
   methods:{
     async changeRepo(){
-      await this.oRepo.setUrlGH(this.linkRepo);
-      this.workBranch = this.oRepo.getDefaultBranch();
+      const tmpLinkRepo = this.linkRepo;
+      const updListRepo = this.nameTarget != this.nameTarget_old;
+
+      if(updListRepo)
+      {
+        this.listRepo = Object.assign([]);
+      }
+
+      // выжидаем таймаут при вводе, чтобы не слать лишних запросов
+      setTimeout(async() => {
+        if(tmpLinkRepo == this.linkRepo){
+          await this.oRepo.setUrlGH(this.linkRepo);
+          this.workBranch = this.oRepo.getDefaultBranch();
+          this.changeBranch();
+
+          if(updListRepo)
+          {
+            this.getListRepos();
+          }
+        }
+      }, 1000);
+
+      this.nameTarget_old = this.nameTarget;
+      this.linkRepo_old = this.linkRepo;
     },
     async changeBranch(){
       await this.oRepo.setBranch(this.workBranch);
       this.dateStart = this.oRepo.getDefaultDateStart();
       this.dateEnd = this.oRepo.getDefaultDateEnd();
+    },
+    async getListRepos(){
+      const res:string[] = await this.oRepo.getlistRepo();
+      for(let ind in res){
+        res[ind] = this.nameTarget + '/' + res[ind] ;
+      }
+      this.listRepo = Object.assign([], res);
     },
     getTitleTab(_mode:Number):string{
       let resTitle = '';
@@ -151,7 +183,9 @@ export default Vue.extend({
       return resTitle;
     },
     async AnalisRepo(){
-      this.oRepo.ReposAnalysis();
+      this.loading = true;
+      await this.oRepo.ReposAnalysis();
+      this.loading = false;
     },
     setDateStart(){
       if(this.dateStart)
