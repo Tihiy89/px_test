@@ -122,7 +122,6 @@ export class reposGitHub {
       }else{
         this.clearRepo();
       }
-
     }
   }
 
@@ -130,14 +129,14 @@ export class reposGitHub {
   private async clearRepo(){
     this.name       = '';
     this.nameRepo   = '';
-    this.listRepo   = [];
-    this.listBranch = [];
+    this.listRepo   = Object.assign( [] );
+    this.listBranch = Object.assign( [] );
     this.mainBranch = '';
     this.workBranch = '';
     this.dateStart  = null;
     this.dateEnd    = null;
-    this.listCommits = [];
-    this.listAutByCom = [];
+    this.listCommits = Object.assign( [] );
+    this.listAutByCom = Object.assign( [] );
   }
 
   /** авторов сортируем по количеству коммитов, если равное по имени */
@@ -161,9 +160,8 @@ export class reposGitHub {
   private async loadBranchInfo() {
     // зануляем итоговые массивы
     this.listPR = this.listCommits = this.listAutByCom = Object.assign( [] );
-
-    this.loadCommitInfo();
-    this.loadPRInfo();
+    await this.loadCommitInfo();
+    await this.loadPRInfo();
   }
 
   // todo: на болььших репозитриях на формирование массивов уходит достаточно много времени,
@@ -210,24 +208,29 @@ export class reposGitHub {
   private async loadRepoInfo() {
     if( this.typeRepo ){
       this.listRepo = Object.assign( [] );
+      // через вспомогательный объект потомучто computed нацелен на список репозитариев
+      let templistRepo = Object.assign( [] );
 
       let page: number = 1;
       while (page) {
         const res = await this.ghApi.useAPI(this.URL_API_REPO(page));
-        this.listRepo = this.listRepo.concat(JSON.parse(this.makeUserArray(res, 'name')));
-        page = ( this.listRepo.length < page*this.perPage) ? 0 : page + 1;
+        templistRepo = templistRepo.concat(JSON.parse(this.makeUserArray(res, 'name')));
+        page = ( templistRepo.length < page*this.perPage) ? 0 : page + 1;
       }
+      this.listRepo = Object.assign( [], templistRepo);
 
       this.listBranch = Object.assign( [] );
+      let templistBranch = Object.assign( [] );
       // выбран существующий репозитарий
       if(this.nameRepo != '' && this.listRepo.indexOf(this.nameRepo) != -1 ){
         // когда извлечем все ветки просто занулим чтобы прервать
         let page: number = 1;
         while (page) {
           const listBranch = await this.ghApi.useAPI(this.URL_API_LISTBRANCHES(page));
-          this.listBranch = this.listBranch.concat(JSON.parse(this.makeUserArray(listBranch, 'name')));
-          page = ( this.listBranch.length < page*this.perPage) ? 0 : page + 1;
+          templistBranch = templistBranch.concat(JSON.parse(this.makeUserArray(listBranch, 'name')));
+          page = ( templistBranch.length < page*this.perPage) ? 0 : page + 1;
         }
+        this.listBranch = Object.assign( [], templistBranch );
 
         // ищем ветку по-умолчанию
         // Общая информация о репозитарии
@@ -352,8 +355,8 @@ export class reposGitHub {
   }
 
   /** непосредственно анализ выбрпнной ветки репозитария */
-  public ReposAnalysis(){
-    this.loadBranchInfo();
+  public async ReposAnalysis(){
+    await this.loadBranchInfo();
   }
 
   /** попытка выбрать репозитарий */
@@ -398,13 +401,22 @@ export class reposGitHub {
     return null;
   }
 
+  public async getDefaultRepoLink():Promise<string>{
+    const user = await this.ghApi.GetUserInfo();
+
+    if(user && user.login)
+      return user.login;
+
+    return '';
+  }
+
   /** список доступных веток для исследуемого репозитария*/
   public getlistBranch():string[]{
     return (this.typeRepo !== null)? Object.assign([],this.listBranch)  : [];
   }
 
   /** список доступных репозитариев для исследуемого пользователя/оргии*/
-  public getlistRepo():string[]{
+  public async getlistRepo():Promise<string[]>{
     return (this.typeRepo !== null)? Object.assign([],this.listRepo)  : [];
   }
 
@@ -437,6 +449,10 @@ export class reposGitHub {
         }, 0 );
 
     return Res;
+  }
+
+  public getRepoIsValid():boolean{
+    return (this.typeRepo)? true : false;
   }
 
   /** имя обследуемой учетной записи*/

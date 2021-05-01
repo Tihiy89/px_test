@@ -47,6 +47,9 @@ export default Vue.extend({
       this.isAut = await this.$http_gha.checkUserToken();
       this.getUserInfo();
       this.getUrlAutGH();
+
+      if(this.stageAut == 1)
+        this.Aut_stage2();
     },
   methods: {
 
@@ -64,6 +67,8 @@ export default Vue.extend({
     async Aut_stage2(){
       this.isAut = await this.$http_gha.Aut();
       this.$emit('aut-complete', this.isAut);
+      const url = new URL(window.location.href);
+      window.location.href = url.origin;
     },
   },
 
