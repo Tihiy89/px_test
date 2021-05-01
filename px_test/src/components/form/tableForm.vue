@@ -19,7 +19,6 @@
         </th>
       </tr>
     </table>
-    <br>
   </div>
 </template>
 
@@ -59,7 +58,7 @@ export default Vue.extend({
     tDataPage: function():tableRow[]{
       const perPage = ( this.paginate != 0 ) ? this.paginate : this.tData.length;
       const i1 = (this.page - 1) * perPage;
-      const i2 = this.page*perPage - 1;
+      const i2 = this.page*perPage;
       let res:tableRow[] = [];
       res = res.concat(this.tHead);
       res = res.concat(this.tData.slice(i1,i2));
