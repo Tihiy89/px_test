@@ -40,17 +40,20 @@ export class GitHubApi{
       url:URL_API_AUTH2,
     };
 
-    const res = await this.axios.post( URL_API_AUTH_PROXY, par).then( (resp) => { return resp; });
-
-    if( res.data !== undefined ){
-      // парсить не хочется, сделаем URL И разберем стандартными ф-ми
-      const urlResp = new URL(URL_API_AUTH2+'?'+res.data);
-      this.token = (urlResp.searchParams.get('token_type')??'') + ' ' + (urlResp.searchParams.get('access_token')??'');
-      this.token = this.token.trim();
+    try {
+      const res = await this.axios.post( URL_API_AUTH_PROXY, par).then( (resp) => { return resp; });
+      if( res.data !== undefined ){
+        // парсить не хочется, сделаем URL И разберем стандартными ф-ми
+        const urlResp = new URL(URL_API_AUTH2+'?'+res.data);
+        this.token = (urlResp.searchParams.get('token_type')??'') + ' ' + (urlResp.searchParams.get('access_token')??'');
+        this.token = this.token.trim();
+        localStorage.user_token = this.token;
+      }
+    } catch (error) {
+      console.log('Не удалось получить токен!!');
+      return false;
     }
 
-    localStorage.user_token = this.token;
-    // window.location.replace(URL_MY);
     return this.token !== '';
   }
 

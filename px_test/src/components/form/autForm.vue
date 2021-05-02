@@ -14,6 +14,7 @@
         Завершить регистрацию
       </button>
     </div>
+    <loadingForm v-if="showErrorMSG||loading" :msg="(showErrorMSG)?msgErrorAut2:''" @close="closeMSG"/>
   </div>
 </template>
 
@@ -22,10 +23,13 @@ import Vue from 'vue';
 export default Vue.extend({
   data(){
     return {
-      user:{name: 'Не авторизованы' as string},
-      urlAut:'',
       isAut: false,
       codeAut: '' as String,
+      loading: false,
+      msgErrorAut2: 'Не удалось получить токен, проверьте, что работает промежуточный сервер.',
+      showErrorMSG: false as Boolean,
+      urlAut:'',
+      user:{name: 'Не авторизованы' as string},
     };
   },
   computed:{
@@ -52,23 +56,33 @@ export default Vue.extend({
         this.Aut_stage2();
     },
   methods: {
-
+    closeMSG(){
+      this.showErrorMSG = false;
+      this.goToMainSheet();
+    },
     getUrlAutGH() {
       this.urlAut = this.$http_gha.getUrlForAut_stage1();
     },
-
     async getUserInfo() {
       const user = await this.$http_gha.GetUserInfo();
 
       if(user && user.login)
         this.user.name=user.login;
     },
-
-    async Aut_stage2(){
-      this.isAut = await this.$http_gha.Aut();
-      this.$emit('aut-complete', this.isAut);
+    goToMainSheet(){
       const url = new URL(window.location.href);
       window.location.href = url.origin;
+    },
+    async Aut_stage2(){
+      this.loading = true;
+      this.isAut = await this.$http_gha.Aut();
+      if(this.isAut){
+        this.$emit('aut-complete', this.isAut);
+        this.goToMainSheet();
+      } else {
+        this.showErrorMSG = true;
+      }
+      this.loading = false;
     },
   },
 
