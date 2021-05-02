@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1>Пробуем API GitHub</h1>
+    <h1>
+        <img src="@/../public/icon.svg" height="40px">
+        Изучаем GitHub
+    </h1>
     <autForm @aut-complete="autComplete" />
     <filterRepoForm v-if="isAut"/>
   </div>
