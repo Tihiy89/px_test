@@ -8,7 +8,10 @@
   --inputs-valid:  #6DA284;
   --inputs-notvalid:  #B79D9D;
   --font-color-def: black;
-
+  --radius-def: 3px;
+  --radius-table: 5px;
+  --table-line-inner: 1px;
+  --table-line-outer: 3px;
 }
 
 /* основной стиль */
@@ -27,7 +30,7 @@
   border-color: var(--lines-elem);
   border-style: solid;
   border-width: 1px;
-  border-radius: 3px;
+  border-radius: var(--radius-def);
 }
 
 input, select, option{
@@ -35,7 +38,7 @@ input, select, option{
   border-color: var(--lines-elem);
   border-style: solid;
   border-width: 1px;
-  border-radius: 3px;
+  border-radius: var(--radius-def);
 }
 
 select{
@@ -53,19 +56,71 @@ select{
 /* компонент таблица */
 .tableForm {
   align-items: center;
-  border-style: solid;
-  border-width: 2px;
-  border-radius: 3px;
   margin: auto;
-  border-collapse: collapse;
-  border-color: var(--lines-elem);
+  border-collapse: separate;
+  border-spacing: 0px;
+  /* border-style: solid; */
+  /* border-width: 1px; */
+  
+  /* border-collapse: collapse; */
+  /* border-color: var(--lines-elem); */
+  /* border: solid; */
+  
 }
 
-.tableForm th,tr {
-  border-style: solid;
-  border-width: 1px;
-   border-color: var(--lines-elem-sec);
+/* внутренние границы */
+.tableForm td{
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-width: var(--table-line-inner); 
+  border-color: var(--lines-elem-sec);
 }
+
+/* внешние границы верх */
+.tableForm tr:first-child td{
+  border-top-style: solid;
+  border-top-width: var(--table-line-outer);
+  border-color: var(--lines-elem-sec);
+}
+
+/* внешние границы слева */
+.tableForm tr td:first-child{
+  border-left-style: solid;
+  border-left-width: var(--table-line-outer);
+  border-color: var(--lines-elem-sec);
+}
+
+/* внешние границы низ */
+.tableForm tr:last-child td{
+  border-bottom-style: solid;
+  border-bottom-width: var(--table-line-outer);
+  border-color: var(--lines-elem-sec);
+}
+
+/* внешние справа */
+.tableForm tr td:last-child{
+  border-right-style: solid;
+  border-right-width: var(--table-line-outer);
+  border-color: var(--lines-elem-sec);
+}
+
+/* углы таблицы */
+.tableForm tr:first-child td:first-child{
+  border-radius: var(--radius-table) 0 0 0;
+}
+
+.tableForm tr:first-child td:last-child{
+  border-radius: 0 var(--radius-table) 0 0;
+}
+
+.tableForm tr:last-child td:first-child{
+  border-radius: 0 0 0 var(--radius-table);
+}
+
+.tableForm tr:last-child td:last-child{
+  border-radius: 0 0 var(--radius-table) 0;
+}
+/* конец компонента таблица */
 
 /* если запрещенное поле не должно выделяться шрифтом */
 .noDisable:disabled{
@@ -89,8 +144,6 @@ select{
   right:0;
   background: rgba(0,0,0,0.5); /* полупрозрачный цвет фона */
   z-index:100; /* выводим фон поверх всех слоев на странице браузера */
-  /* text-align: center;
-  vertical-align: middle; */
   display: flex;
 }
 

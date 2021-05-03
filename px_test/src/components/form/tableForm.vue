@@ -7,7 +7,7 @@
     </div>
     <table class="tableForm">
       <tr v-for="row in tDataPage" :key="row.ind">
-        <th v-for="item in row.Cols" :key="item.ind">
+        <td v-for="item in row.Cols" :key="item.ind">
           <div v-if="!!item.link && item.link!='' ">
             <a :href="item.link" target="_blank">
               {{item.val}}
@@ -16,7 +16,7 @@
           <div v-else>
             {{item.val}}
           </div>
-        </th>
+        </td>
       </tr>
     </table>
   </div>
