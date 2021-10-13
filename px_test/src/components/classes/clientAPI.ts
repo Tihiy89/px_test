@@ -12,9 +12,9 @@ const API_HEAD_DEF = {accept: 'application/vnd.github.v3+json'};
 
 export class GitHubApi{
   // /** идентификтаор приложения гитхаб */
-  private app_id:String = 'c5854afba787a9e4a397';
+  private app_id:String = 'хххххххххххххххххх';
   // /** идентификтаор клиентского приложения */
-  // private client_id:String = '2db9bbe82e963db416698f664506769dfa5a1b1f';
+  // private client_id:String = 'ххххххххххххххххххх';
   /** токен пользователя */
   private token:String = '';
 
@@ -66,7 +66,7 @@ export class GitHubApi{
   }
 
   /** формируем URL для перехода для авторизации
-  что-то вида "https://github.com/login/oauth/authorize?client_id=c5854afba787a9e4a397&redirect_uri=http://localhost:8080/"
+  что-то вида "https://github.com/login/oauth/authorize?client_id=хххххххххххххх&redirect_uri=http://localhost:8080/"
   в идеале добавить еще параметр state, но наши цели академические
   и делать этого мы конечно же не будем */
   public getUrlForAut_stage1():String{
